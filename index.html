@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>কর্জে হাসানা সেবা</title>
+    
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #00695c; /* Islamic Teal */
+            --secondary-color: #e0f2f1;
+            --accent-color: #1de9b6;
+        }
+
+        body {
+            font-family: 'Hind Siliguri', sans-serif;
+            background-color: #f3f4f6;
+            color: #333;
+        }
+
+        /* Login Screen Styles */
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #004d40 0%, #00695c 100%);
+        }
+        
+        .login-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        /* Dashboard Styles */
+        .app-header {
+            background: #fff;
+            padding: 15px 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .balance-card {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            border-radius: 20px;
+            color: white;
+            padding: 30px 20px;
+            margin-top: 20px;
+            box-shadow: 0 10px 20px rgba(17, 153, 142, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .balance-card::before {
+            content: '\f19c'; /* Mosque Icon */
+            font-family: "Font Awesome 6 Free"; 
+            font-weight: 900;
+            position: absolute;
+            right: -20px;
+            bottom: -20px;
+            font-size: 150px;
+            opacity: 0.1;
+            color: #fff;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #555;
+            margin: 25px 0 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Transaction List Styles */
+        .transaction-item {
+            background: #fff;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+            border-left: 5px solid transparent;
+            transition: transform 0.2s;
+        }
+
+        .transaction-item:active {
+            transform: scale(0.98);
+        }
+
+        .type-taken { border-left-color: #ff5252; }
+        .type-paid { border-left-color: #00c853; }
+
+        .icon-box {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            margin-right: 15px;
+        }
+
+        .icon-taken { background: #ffebee; color: #ff5252; }
+        .icon-paid { background: #e8f5e9; color: #00c853; }
+
+        .trans-date { font-size: 0.85rem; color: #888; }
+        .trans-amount { font-weight: 700; font-size: 1.1rem; }
+
+        .hidden { display: none !important; }
+        
+        /* Loading Spinner */
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<!-- 1. LOGIN VIEW -->
+<section id="loginView" class="login-container">
+    <div class="login-card">
+        <div class="text-center mb-4">
+            <i class="fas fa-kaaba fa-3x text-success mb-3"></i>
+            <h3 class="fw-bold" style="color: #004d40;">কর্জে হাসানা সেবা</h3>
+            <p class="text-muted small">মসজিদ ভিত্তিক সুদমুক্ত লোন কার্যক্রম</p>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold small">ইমেইল এড্রেস</label>
+            <div class="input-group">
+                <span class="input-group-text bg-light border-end-0"><i class="fas fa-envelope text-muted"></i></span>
+                <input type="email" id="userEmail" class="form-control border-start-0 bg-light" placeholder="email@example.com">
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label fw-bold small">পাসওয়ার্ড</label>
+            <div class="input-group">
+                <span class="input-group-text bg-light border-end-0"><i class="fas fa-lock text-muted"></i></span>
+                <input type="password" id="userPass" class="form-control border-start-0 bg-light" placeholder="******">
+            </div>
+        </div>
+
+        <button onclick="handleLogin()" class="btn btn-success w-100 py-2 fw-bold shadow-sm" style="background-color: #00695c;">
+            প্রবেশ করুন <i class="fas fa-arrow-right ms-2"></i>
+        </button>
+
+        <p id="loginError" class="text-danger mt-3 text-center small fw-bold"></p>
+        
+        <div class="mt-4 text-center border-top pt-3">
+            <small class="text-muted">অ্যাকাউন্ট নেই? দয়া করে মসজিদ কমিটির সাথে যোগাযোগ করুন।</small>
+        </div>
+    </div>
+</section>
+
+<!-- 2. DASHBOARD VIEW -->
+<section id="dashboardView" class="hidden pb-5">
+    
+    <!-- Top Header -->
+    <div class="app-header d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-2">
+            <div class="bg-light rounded-circle p-2">
+                <i class="fas fa-user text-dark"></i>
+            </div>
+            <div>
+                <small class="text-muted d-block" style="line-height: 1;">আসসালামু আলাইকুম,</small>
+                <span id="userNameDisplay" class="fw-bold text-dark">লোড হচ্ছে...</span>
+            </div>
+        </div>
+        <button onclick="handleLogout()" class="btn btn-sm btn-outline-danger border-0 bg-light">
+            <i class="fas fa-sign-out-alt"></i>
+        </button>
+    </div>
+
+    <div class="container">
+        
+        <!-- Balance Card -->
+        <div class="balance-card text-center">
+            <p class="mb-1 opacity-75">বর্তমান বকেয়া লোন</p>
+            <h1 class="display-3 fw-bold mb-0">
+                <span id="balanceDisplay">0</span> <span class="fs-4">৳</span>
+            </h1>
+            <div class="mt-3 bg-white bg-opacity-25 d-inline-block px-3 py-1 rounded-pill">
+                <i class="fas fa-phone-alt me-1"></i> <span id="userPhoneDisplay">...</span>
+            </div>
+        </div>
+
+        <!-- Transaction History -->
+        <div class="section-title">
+            <i class="fas fa-history text-primary"></i>
+            <span>সাম্প্রতিক লেনদেন</span>
+        </div>
+
+        <div id="historyList">
+            <!-- Loading State -->
+            <div class="loader"></div>
+        </div>
+
+        <!-- Empty State (Hidden by default) -->
+        <div id="emptyState" class="text-center mt-5 hidden">
+            <i class="fas fa-folder-open fa-3x text-muted mb-3 opacity-25"></i>
+            <p class="text-muted">কোনো লেনদেনের তথ্য পাওয়া যায়নি</p>
+        </div>
+
+    </div>
+</section>
+
+<!-- Firebase Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+    import { getFirestore, doc, onSnapshot, collection, query, orderBy } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+    // --- CONFIGURATION ---
+    const firebaseConfig = {
+  apiKey: "AIzaSyAOapTnm-ACTuLXCaqHC5GdPZRzAWhdUZs",
+  authDomain: "mosqueloan1.firebaseapp.com",
+  projectId: "mosqueloan1",
+  storageBucket: "mosqueloan1.firebasestorage.app",
+  messagingSenderId: "907293073577",
+  appId: "1:907293073577:web:32dab573a7d2dfa87989b8"
+};
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const loginView = document.getElementById('loginView');
+    const dashboardView = document.getElementById('dashboardView');
+    const loginError = document.getElementById('loginError');
+
+    // Auth State Listener
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            loginView.classList.add('hidden');
+            dashboardView.classList.remove('hidden');
+            loadUserData(user.uid);
+        } else {
+            loginView.classList.remove('hidden');
+            dashboardView.classList.add('hidden');
+        }
+    });
+
+    // Login Function
+    window.handleLogin = () => {
+        const email = document.getElementById('userEmail').value;
+        const pass = document.getElementById('userPass').value;
+        loginError.innerText = "";
+        
+        if(!email || !pass) {
+            loginError.innerText = "দয়া করে ইমেইল ও পাসওয়ার্ড দিন";
+            return;
+        }
+
+        const btn = document.querySelector('button');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> যাচাই করা হচ্ছে...';
+        btn.disabled = true;
+
+        signInWithEmailAndPassword(auth, email, pass)
+            .catch((error) => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                if(error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+                    loginError.innerText = "ভুল তথ্য! কমিটির সাথে যোগাযোগ করুন।";
+                } else {
+                    loginError.innerText = "ত্রুটি: " + error.message;
+                }
+            });
+    };
+
+    // Logout Function
+    window.handleLogout = () => {
+        if(confirm("আপনি কি লগ আউট করতে চান?")) {
+            signOut(auth);
+        }
+    };
+
+    // Data Loading Function
+    function loadUserData(uid) {
+        // 1. Fetch User Profile
+        onSnapshot(doc(db, "users", uid), (doc) => {
+            if(doc.exists()) {
+                const data = doc.data();
+                document.getElementById('userNameDisplay').innerText = data.name;
+                document.getElementById('userPhoneDisplay').innerText = data.phone;
+                // Animate balance number slightly if needed, purely visual
+                document.getElementById('balanceDisplay').innerText = data.currentBalance.toLocaleString('bn-BD');
+            }
+        });
+
+        // 2. Fetch Transactions
+        const q = query(collection(db, "users", uid, "transactions"), orderBy("date", "desc"));
+        onSnapshot(q, (snapshot) => {
+            const listContainer = document.getElementById('historyList');
+            const emptyState = document.getElementById('emptyState');
+            
+            listContainer.innerHTML = '';
+
+            if (snapshot.empty) {
+                emptyState.classList.remove('hidden');
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+            }
+
+            snapshot.forEach((doc) => {
+                const t = doc.data();
+                const dateObj = t.date ? t.date.toDate() : new Date();
+                
+                // Format Date in Bengali
+                const dateOptions = { day: 'numeric', month: 'long', year: 'numeric' };
+                const dateStr = dateObj.toLocaleDateString('bn-BD', dateOptions);
+
+                let iconHtml = '';
+                let typeClass = '';
+                let amountColor = '';
+                let typeText = '';
+
+                if(t.type === 'taken') {
+                    // Loan Taken
+                    typeClass = 'type-taken';
+                    iconHtml = '<div class="icon-box icon-taken"><i class="fas fa-hand-holding-usd"></i></div>';
+                    amountColor = 'text-danger';
+                    typeText = 'লোন গ্রহণ করেছেন';
+                } else {
+                    // Repayment
+                    typeClass = 'type-paid';
+                    iconHtml = '<div class="icon-box icon-paid"><i class="fas fa-check-circle"></i></div>';
+                    amountColor = 'text-success';
+                    typeText = 'লোন পরিশোধ করেছেন';
+                }
+
+                const itemHtml = `
+                    <div class="transaction-item ${typeClass}">
+                        <div class="d-flex align-items-center">
+                            ${iconHtml}
+                            <div>
+                                <h6 class="mb-0 fw-bold">${typeText}</h6>
+                                <small class="trans-date">${dateStr}</small>
+                            </div>
+                        </div>
+                        <div class="trans-amount ${amountColor}">
+                            ${t.amount.toLocaleString('bn-BD')} ৳
+                        </div>
+                    </div>
+                `;
+                
+                listContainer.innerHTML += itemHtml;
+            });
+        });
+    }
+</script>
+</body>
+</html>
